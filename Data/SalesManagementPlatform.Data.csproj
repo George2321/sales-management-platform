@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Database/*.sql" />
+  </ItemGroup>
+
 </Project>

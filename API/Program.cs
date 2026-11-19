@@ -1,24 +1,18 @@
-using SalesManagementPlatform.Data;
-using SalesManagementPlatform.Data.Repositories;
-using SalesManagementPlatform.Infrastructure;
+using SalesManagementPlatform.Api.Configuration;
+using SalesManagementPlatform.Data.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var sqlitePath = builder.Configuration["Database:SqlitePath"]
-    ?? throw new InvalidOperationException("Configure Database:SqlitePath in the API settings.");
-var databasePath = Path.GetFullPath(sqlitePath, builder.Environment.ContentRootPath);
-
-// Add services to the container.
-
+builder.Services.AddDatabaseAndRepositories(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IDbConnectionFactory>(new SqliteConnectionFactory(databasePath));
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+await app.Services.GetRequiredService<SqliteDatabaseInitializer>()
+    .InitializeAsync(app.Configuration.GetValue<bool>("Database:SeedDemoData"));
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -26,8 +20,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+var serveUi = app.Environment.WebRootFileProvider.GetFileInfo("index.html").Exists;
+if (serveUi)
+{
+    app.UseStaticFiles();
+}
+
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/api/health");
+
+if (serveUi)
+{
+    app.MapFallback("/api/{**path}", () => Results.NotFound());
+    app.MapFallbackToFile("index.html");
+}
 
 app.Run();
