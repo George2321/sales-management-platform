@@ -10,12 +10,14 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-build
 WORKDIR /src
 COPY API/SalesManagementPlatform.Api.csproj API/
+COPY Application/SalesManagementPlatform.Application.csproj Application/
 COPY Data/SalesManagementPlatform.Data.csproj Data/
 COPY Domain/Domain.csproj Domain/
 COPY Infrastructure/SalesManagementPlatform.Infrastructure.csproj Infrastructure/
 RUN dotnet restore API/SalesManagementPlatform.Api.csproj
 
 COPY API/ API/
+COPY Application/ Application/
 COPY Data/ Data/
 COPY Domain/ Domain/
 COPY Infrastructure/ Infrastructure/

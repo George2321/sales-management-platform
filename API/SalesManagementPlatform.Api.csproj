@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\SalesManagementPlatform.Application.csproj" />
     <ProjectReference Include="..\Data\SalesManagementPlatform.Data.csproj" />
     <ProjectReference Include="..\Infrastructure\SalesManagementPlatform.Infrastructure.csproj" />
   </ItemGroup>

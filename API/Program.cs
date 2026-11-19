@@ -4,6 +4,7 @@ using SalesManagementPlatform.Data.Database;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseAndRepositories(builder.Configuration, builder.Environment);
+builder.Services.AddApplicationServices();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi();

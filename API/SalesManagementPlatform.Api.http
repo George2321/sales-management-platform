@@ -1,6 +1,6 @@
 @SalesManagementPlatform.Api_HostAddress = http://localhost:5058
 
-GET {{SalesManagementPlatform.Api_HostAddress}}/weatherforecast/
+GET {{SalesManagementPlatform.Api_HostAddress}}/api/PurchaseOrder
 Accept: application/json
 
 ###

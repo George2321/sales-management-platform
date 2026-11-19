@@ -1,3 +1,4 @@
+using SalesManagementPlatform.Application.Orders;
 using SalesManagementPlatform.Data;
 using SalesManagementPlatform.Data.Database;
 using SalesManagementPlatform.Data.Repositories;
@@ -7,6 +8,11 @@ namespace SalesManagementPlatform.Api.Configuration;
 
 internal static class DependencyInjection
 {
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
+        return services.AddScoped<IOrderService, OrderService>();
+    }
+
     public static IServiceCollection AddDatabaseAndRepositories(
         this IServiceCollection services,
         IConfiguration configuration,

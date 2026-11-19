@@ -1,0 +1,127 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f4f7fa;
+  color: #1a2a3a;
+}
+
+.container {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.product-bar {
+  background: #162638;
+  color: #fff;
+  padding-block: 1rem;
+  font-weight: 650;
+}
+
+main {
+  padding-block: clamp(1.75rem, 5vw, 3.5rem);
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 4vw, 2.2rem);
+  letter-spacing: -.035em;
+}
+
+.order-count {
+  color: #506174;
+  font-size: .9rem;
+}
+
+.orders-panel {
+  background: #fff;
+  border: 1px solid #dce4ec;
+  border-radius: .75rem;
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid #165b82;
+  outline-offset: -3px;
+}
+
+table {
+  width: 100%;
+  min-width: 39rem;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: .9rem;
+}
+
+th, td {
+  padding: .8rem clamp(.75rem, 2vw, 1.35rem);
+  border-bottom: 1px solid #e7ecf1;
+  overflow-wrap: anywhere;
+}
+
+thead {
+  background: #f9fbfd;
+  color: #42566b;
+}
+
+tbody th {
+  font-weight: 650;
+}
+
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+time {
+  white-space: nowrap;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  display: inline-block;
+  padding: .22rem .65rem;
+  border-radius: 1rem;
+  font-size: .8rem;
+  font-weight: 650;
+}
+
+.status--pending { background: #fff2d5; color: #734700; }
+.status--confirmed { background: #e5f1fc; color: #145782; }
+.status--fulfilled { background: #e1f4e9; color: #176342; }
+.status--cancelled { background: #f8e8ed; color: #87354d; }
+
+.message {
+  margin: 0;
+  padding: 2rem;
+  color: #42566b;
+}
+
+.message p {
+  margin: 0 0 .75rem;
+}
+
+button {
+  border: 1px solid #1c5376;
+  border-radius: .4rem;
+  background: #1c5376;
+  color: #fff;
+  padding: .6rem .9rem;
+  cursor: pointer;
+  font: inherit;
+}

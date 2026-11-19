@@ -1,0 +1,53 @@
+<header class="product-bar">
+  <div class="container">Sales Management</div>
+</header>
+
+<main class="container">
+  @let view = state();
+  <div class="heading">
+    <h1 id="orders-title">Purchase orders</h1>
+    @if (view.kind === 'ready') {
+      <span class="order-count">{{ view.orders.length }} {{ view.orders.length === 1 ? 'order' : 'orders' }}</span>
+    }
+  </div>
+
+  <section class="orders-panel" aria-labelledby="orders-title" [attr.aria-busy]="view.kind === 'loading'">
+    @if (view.kind === 'loading') {
+      <p class="message" role="status">Loading purchase orders…</p>
+    } @else if (view.kind === 'error') {
+      <div class="message">
+        <p role="alert">Purchase orders couldn’t be loaded.</p>
+        <button type="button" (click)="loadOrders()">Try again</button>
+      </div>
+    } @else if (view.orders.length === 0) {
+      <p class="message" role="status">No purchase orders yet.</p>
+    } @else {
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Purchase order list">
+        <table aria-labelledby="orders-title">
+          <thead>
+            <tr>
+              <th scope="col">Order reference</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Order date</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="numeric">Line items</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of view.orders; track order.id) {
+              <tr>
+                <th scope="row">{{ order.clientProvidedExternalReference }}</th>
+                <td>{{ order.customerName }}</td>
+                <td><time [attr.datetime]="order.orderDateTimestamp">{{ order.orderDateTimestamp | date:'d MMM yyyy':'UTC' }}</time></td>
+                <td>
+                  <span class="status" [class]="statusDetails[order.status].tone">{{ statusDetails[order.status].label }}</span>
+                </td>
+                <td class="numeric">{{ order.lineItemCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</main>

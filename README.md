@@ -1,5 +1,7 @@
 # Sales Management Platform
 
+The home page opens the Sales Management screen at `/sales-management`. It lists purchase orders from `GET /api/PurchaseOrder`.
+
 ## Run and clone locally with Docker instructions:
 
 Install Docker with Compose and start Docker. From the repository root, run:
