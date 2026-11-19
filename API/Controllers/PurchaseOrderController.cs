@@ -7,5 +7,6 @@ namespace SalesManagementPlatform.Api.Controllers
     [ApiController]
     public class PurchaseOrderController : ControllerBase
     {
+
     }
 }

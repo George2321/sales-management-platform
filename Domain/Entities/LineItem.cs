@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SalesManagementPlatform.Domain
+namespace SalesManagementPlatform.Domain.Entities
 {
-    public class LineItem
+    public sealed class LineItem
     {
         public Guid Id { get; } = Guid.NewGuid();
-        public string Sku { get;  }
-        public string Name { get;  }
+        public string Sku { get; }
+        public string Name { get; }
         public int Quantity { get; private set; }
         public decimal UnitPrice { get; private set; }
-        public decimal LineTotal => Quantity * UnitPrice;    
+        public decimal LineTotal => CalculateLineTotal();
 
         public LineItem(string sku, string name, int quantity, decimal unitPrice)
         {
@@ -22,7 +22,7 @@ namespace SalesManagementPlatform.Domain
             Name = name;
             Quantity = quantity;
             UnitPrice = unitPrice;
-        }    
+        }
 
         public void ChangeQuantity(int quantity)
         {
@@ -30,10 +30,15 @@ namespace SalesManagementPlatform.Domain
             Quantity = quantity;
         }
 
-         public void ChangeUnitPrice(decimal price)
-         {
+        public void ChangeUnitPrice(decimal price)
+        {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
             UnitPrice = price;
-         }
-    } 
+        }
+
+        public decimal CalculateLineTotal()
+        {
+            return Quantity * UnitPrice;
+        }
+    }
 }

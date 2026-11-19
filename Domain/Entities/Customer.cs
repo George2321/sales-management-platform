@@ -1,5 +1,5 @@
 
-namespace SalesManagementPlatform.Domain
+namespace SalesManagementPlatform.Domain.Entities
 {
     public sealed class Customer
     {
