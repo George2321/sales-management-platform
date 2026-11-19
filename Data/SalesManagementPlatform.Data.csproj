@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\SalesManagementPlatform.Application.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Domain\SalesManagementPlatform.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

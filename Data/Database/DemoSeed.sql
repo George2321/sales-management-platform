@@ -1,33 +1,23 @@
-INSERT INTO Customers (Id, Name, Email) VALUES
-    ('10000000-0000-4000-8000-000000000001', 'Amina Patel', 'amina@karoo-coffee.example'),
-    ('10000000-0000-4000-8000-000000000002', 'Lebo Mokoena', 'lebo@moonrise-club.example'),
-    ('10000000-0000-4000-8000-000000000003', 'Nandi Jacobs', 'nandi@velvet-thunder.example'),
-    ('10000000-0000-4000-8000-000000000004', 'Pieter van Wyk', 'pieter@pigeon-parade.example'),
-    ('10000000-0000-4000-8000-000000000005', 'Zinhle Nkosi', 'zinhle@sea-glass-studio.example'),
-    ('10000000-0000-4000-8000-000000000006', 'Samira Desai', 'samira@tiny-dinosaur-lab.example'),
-    ('10000000-0000-4000-8000-000000000007', 'Thabo Ndlovu', 'thabo@orbit-arcade.example'),
-    ('10000000-0000-4000-8000-000000000008', 'Isabel Daniels', 'isabel@fable-picnic.example');
-
 -- Spread the orders between the beginning of the current UTC month and startup.
-WITH DemoOrders (OrderNumber, Reference, CustomerNumber, Status, Notes) AS (
+WITH DemoOrders (OrderNumber, Reference, Status, Notes) AS (
     VALUES
-        (1, 'DEMO-KAROO-01', 1, @Fulfilled, 'Supplies for a sunrise coffee pop-up in the Karoo.'),
-        (2, 'DEMO-MOON-02', 2, @Confirmed, 'Rooftop stargazing kit. Keep the lights red.'),
-        (3, 'DEMO-VELVET-03', 3, @Pending, 'Parts for a cardboard robot costume with a velvet cape.'),
-        (4, 'DEMO-PIGEON-04', 4, @Cancelled, 'The parade changed its mascot from a pigeon to a pelican.'),
-        (5, 'DEMO-TIDE-05', 5, @Fulfilled, 'Workshop supplies for a sea-glass mosaic night.'),
-        (6, 'DEMO-DINO-06', 6, @Confirmed, 'Miniature fossil digs for a school science fair.'),
-        (7, 'DEMO-ORBIT-07', 7, @Pending, 'Retro arcade repair supplies. Ask for the high-score initials.'),
-        (8, 'DEMO-FABLE-08', 8, @Fulfilled, 'A picnic order for a silent reading club.'),
-        (9, 'DEMO-MOON-09', 2, @Cancelled, 'Outdoor screening cancelled after the wind forecast.'),
-        (10, 'DEMO-KAROO-10', 1, @Pending, 'One golden trophy for the latte-art champion.')
+        (1, 'DEMO-KAROO-01', @Fulfilled, 'Supplies for a sunrise coffee pop-up in the Karoo.'),
+        (2, 'DEMO-MOON-02', @Confirmed, 'Rooftop stargazing kit. Keep the lights red.'),
+        (3, 'DEMO-VELVET-03', @Pending, 'Parts for a cardboard robot costume with a velvet cape.'),
+        (4, 'DEMO-PIGEON-04', @Cancelled, 'The parade changed its mascot from a pigeon to a pelican.'),
+        (5, 'DEMO-TIDE-05', @Fulfilled, 'Workshop supplies for a sea-glass mosaic night.'),
+        (6, 'DEMO-DINO-06', @Confirmed, 'Miniature fossil digs for a school science fair.'),
+        (7, 'DEMO-ORBIT-07', @Pending, 'Retro arcade repair supplies. Ask for the high-score initials.'),
+        (8, 'DEMO-FABLE-08', @Fulfilled, 'A picnic order for a silent reading club.'),
+        (9, 'DEMO-MOON-09', @Cancelled, 'Outdoor screening cancelled after the wind forecast.'),
+        (10, 'DEMO-KAROO-10', @Pending, 'One golden trophy for the latte-art champion.')
 ),
 SeedClock (MonthStart, ElapsedSeconds) AS (
     SELECT unixepoch('now', 'start of month'), unixepoch('now') - unixepoch('now', 'start of month')
 )
 INSERT INTO Orders (
     Id, ClientProvidedExternalReference, OrderDateTimestamp, CompletedDateTimeStamp,
-    Status, Currency, Notes, CustomerId
+    Status, Currency, Notes
 )
 SELECT
     printf('20000000-0000-4000-8000-%012d', OrderNumber),
@@ -38,8 +28,7 @@ SELECT
     END,
     Status,
     'ZAR',
-    Notes,
-    printf('10000000-0000-4000-8000-%012d', CustomerNumber)
+    Notes
 FROM DemoOrders
 CROSS JOIN SeedClock;
 

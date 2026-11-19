@@ -1,5 +1,5 @@
 using Dapper;
-using SalesManagementPlatformDomain.ValueTypes;
+using SalesManagementPlatform.Domain.ValueTypes;
 
 namespace SalesManagementPlatform.Data.Database;
 
@@ -21,7 +21,7 @@ public sealed class SqliteDatabaseInitializer
         await connection.ExecuteAsync(await ReadScriptAsync("Schema.sql"), transaction: transaction);
 
         if (seedDemoData && !await connection.ExecuteScalarAsync<bool>(
-                "SELECT EXISTS (SELECT 1 FROM Customers);", transaction: transaction))
+                "SELECT EXISTS (SELECT 1 FROM Orders);", transaction: transaction))
         {
             var statuses = new
             {

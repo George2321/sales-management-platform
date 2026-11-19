@@ -1,4 +1,4 @@
-namespace SalesManagementPlatformDomain.ValueTypes
+namespace SalesManagementPlatform.Domain.ValueTypes
 {
     public enum OrderStatus
     {

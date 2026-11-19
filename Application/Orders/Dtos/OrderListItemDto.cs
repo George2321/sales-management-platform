@@ -1,11 +1,13 @@
-using SalesManagementPlatformDomain.ValueTypes;
+using SalesManagementPlatform.Domain.ValueTypes;
 
 namespace SalesManagementPlatform.Application.Orders.Dtos;
 
 public sealed record OrderListItemDto(
     Guid Id,
     string ClientProvidedExternalReference,
-    string CustomerName,
     DateTime OrderDateTimestamp,
     OrderStatus Status,
-    int LineItemCount);
+    int LineItemCount,
+    string Currency,
+    decimal Subtotal,
+    decimal Total);

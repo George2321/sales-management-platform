@@ -1,0 +1,11 @@
+.product-bar {
+  background: #162638;
+  color: #fff;
+  padding-block: 1rem;
+  font-weight: 650;
+}
+
+.product-bar div {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+}

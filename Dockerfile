@@ -12,7 +12,7 @@ WORKDIR /src
 COPY API/SalesManagementPlatform.Api.csproj API/
 COPY Application/SalesManagementPlatform.Application.csproj Application/
 COPY Data/SalesManagementPlatform.Data.csproj Data/
-COPY Domain/Domain.csproj Domain/
+COPY Domain/SalesManagementPlatform.Domain.csproj Domain/
 COPY Infrastructure/SalesManagementPlatform.Infrastructure.csproj Infrastructure/
 RUN dotnet restore API/SalesManagementPlatform.Api.csproj
 

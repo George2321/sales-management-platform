@@ -1,0 +1,61 @@
+<main>
+  <header>
+    <a [routerLink]="saving() ? null : '..'" [replaceUrl]="true" [attr.aria-disabled]="saving() || null">
+      Back to purchase orders
+    </a>
+    <h1>New order</h1>
+  </header>
+
+  <form [formGroup]="form" [attr.aria-busy]="saving()" (ngSubmit)="saveOrder()">
+    <fieldset [disabled]="saving()">
+      <div class="fields">
+        <label>
+          Order reference
+          <input formControlName="clientProvidedExternalReference" maxlength="128" required>
+        </label>
+        <label>
+          Currency code
+          <input formControlName="currency" maxlength="3" required>
+        </label>
+        <label class="wide">
+          Notes (optional)
+          <textarea formControlName="notes" rows="2"></textarea>
+        </label>
+      </div>
+
+      <div formArrayName="lineItems">
+        @for (item of form.controls.lineItems.controls; track item; let index = $index) {
+          <fieldset class="line-item" [formGroupName]="index">
+            <legend>Line item {{ index + 1 }}</legend>
+            <div class="item-fields">
+              <label>SKU <input formControlName="sku" maxlength="64" required></label>
+              <label>Name <input formControlName="name" maxlength="200" required></label>
+              <label>Quantity <input type="number" formControlName="quantity" min="1" step="1" required></label>
+              <label>Unit price <input type="number" formControlName="unitPrice" min="0" step="any" required></label>
+            </div>
+            @if (form.controls.lineItems.length > 1) {
+              <button type="button" (click)="removeLineItem(index)" [attr.aria-label]="'Remove line item ' + (index + 1)">
+                Remove
+              </button>
+            }
+          </fieldset>
+        }
+      </div>
+      <button type="button" (click)="addLineItem()">Add line item</button>
+
+      @if (form.touched && form.invalid) {
+        <p class="error" role="status">Check the highlighted fields. Enter a three-letter currency code, whole quantities, and positive prices.</p>
+      }
+      @if (saveError(); as error) {
+        <p class="error" role="alert">{{ error }}</p>
+      }
+
+      <div class="actions">
+        <button class="primary" type="submit">{{ saving() ? 'Saving…' : 'Save order' }}</button>
+        <a [routerLink]="saving() ? null : '..'" [replaceUrl]="true" [attr.aria-disabled]="saving() || null">
+          Cancel
+        </a>
+      </div>
+    </fieldset>
+  </form>
+</main>

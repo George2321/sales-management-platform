@@ -1,6 +1,35 @@
 @SalesManagementPlatform.Api_HostAddress = http://localhost:5058
+@OrderId = 20000000-0000-4000-8000-000000000010
 
 GET {{SalesManagementPlatform.Api_HostAddress}}/api/PurchaseOrder
 Accept: application/json
 
 ###
+
+GET {{SalesManagementPlatform.Api_HostAddress}}/api/PurchaseOrder/{{OrderId}}
+Accept: application/json
+
+###
+
+# Example for a Pending order. Use the status from the details response as expectedStatus.
+PATCH {{SalesManagementPlatform.Api_HostAddress}}/api/PurchaseOrder/{{OrderId}}/status
+Content-Type: application/json
+
+{
+  "expectedStatus": 0,
+  "status": 1
+}
+
+###
+
+POST {{SalesManagementPlatform.Api_HostAddress}}/api/PurchaseOrder
+Content-Type: application/json
+
+{
+  "clientProvidedExternalReference": "DEMO-NEW-001",
+  "currency": "ZAR",
+  "notes": "New test order.",
+  "lineItems": [
+    { "sku": "CAF-CUP", "name": "Enamel tasting cup", "quantity": 2, "unitPrice": 85.50 }
+  ]
+}

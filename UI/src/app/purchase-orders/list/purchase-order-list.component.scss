@@ -1,20 +1,6 @@
-:host {
-  display: block;
-  min-height: 100vh;
-  background: #f4f7fa;
-  color: #1a2a3a;
-}
-
 .container {
   width: min(70rem, calc(100% - 2rem));
   margin-inline: auto;
-}
-
-.product-bar {
-  background: #162638;
-  color: #fff;
-  padding-block: 1rem;
-  font-weight: 650;
 }
 
 main {
@@ -39,6 +25,12 @@ h1 {
 .order-count {
   color: #506174;
   font-size: .9rem;
+}
+
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .orders-panel {
@@ -116,7 +108,7 @@ time {
   margin: 0 0 .75rem;
 }
 
-button {
+button, .new-order {
   border: 1px solid #1c5376;
   border-radius: .4rem;
   background: #1c5376;
@@ -124,4 +116,20 @@ button {
   padding: .6rem .9rem;
   cursor: pointer;
   font: inherit;
+}
+
+.new-order {
+  text-decoration: none;
+}
+
+.order-reference {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #145782;
+  font-weight: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+  overflow-wrap: anywhere;
 }

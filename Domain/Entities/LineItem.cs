@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SalesManagementPlatform.Domain.Exceptions;
 
 namespace SalesManagementPlatform.Domain.Entities
 {
@@ -14,25 +11,48 @@ namespace SalesManagementPlatform.Domain.Entities
         public decimal UnitPrice { get; private set; }
         public decimal LineTotal => CalculateLineTotal();
 
-        public LineItem(string sku, string name, int quantity, decimal unitPrice)
+        public LineItem(string? sku, string? name, int quantity, decimal unitPrice)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            Name = name.Trim();
-            Sku = sku;
-            Name = name;
-            Quantity = quantity;
-            UnitPrice = unitPrice;
+            var itemSku = sku?.Trim() ?? string.Empty;
+            if (itemSku.Length is 0 or > 64)
+            {
+                throw new DomainRuleException("Enter a line item SKU of 1 to 64 characters.");
+            }
+
+            var itemName = name?.Trim() ?? string.Empty;
+            if (itemName.Length == 0)
+            {
+                throw new DomainRuleException("Line item name is required.");
+            }
+
+            if (itemName.Length > 200)
+            {
+                throw new DomainRuleException("Line item name must be 200 characters or fewer.");
+            }
+
+            Sku = itemSku;
+            Name = itemName;
+            ChangeQuantity(quantity);
+            ChangeUnitPrice(unitPrice);
         }
 
         public void ChangeQuantity(int quantity)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+            if (quantity <= 0)
+            {
+                throw new DomainRuleException("Line item quantity must be greater than zero.");
+            }
+
             Quantity = quantity;
         }
 
         public void ChangeUnitPrice(decimal price)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
+            if (price <= 0)
+            {
+                throw new DomainRuleException("Line item unit price must be greater than zero.");
+            }
+
             UnitPrice = price;
         }
 

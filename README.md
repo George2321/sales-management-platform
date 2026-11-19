@@ -1,6 +1,5 @@
 # Sales Management Platform
 
-The home page opens the Sales Management screen at `/sales-management`. It lists purchase orders from `GET /api/PurchaseOrder`.
 
 ## Run and clone locally with Docker instructions:
 
@@ -40,4 +39,6 @@ Open [http://localhost:4200](http://localhost:4200). Angular forwards `/api` req
 
 ## Database setup
 
-The API creates any missing tables and indexes from `Data/Database/Schema.sql` at startup. The local Development profile and Docker Compose also enable `Database:SeedDemoData`. On an empty database, the seed adds eight fictional customers and ten orders dated in the current UTC month. An existing database with customers keeps its records and dates on subsequent starts.
+The API creates any missing tables and indexes from `Data/Database/Schema.sql` at startup. The local Development profile and Docker Compose also enable `Database:SeedDemoData`. If the orders table is empty, the seed adds ten orders dated in the current UTC month. If orders already exist, startup keeps their records and dates.
+
+If you ran an older schema locally, stop the API and move `API/sales.db` aside before restarting. The API will create a fresh database from the current schema.

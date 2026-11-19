@@ -1,0 +1,87 @@
+<dialog #dialog aria-labelledby="order-details-title" (close)="closed.emit()" (cancel)="preventCloseWhileSaving($event)">
+  @let view = state();
+  @let saveFeedback = feedback();
+  <header>
+    <h2 id="order-details-title">Order details</h2>
+    <button type="button" autofocus [disabled]="saving()" (click)="dialog.close()">Close</button>
+  </header>
+
+  @if (view.kind === 'loading') {
+    <p role="status">Loading order details…</p>
+  } @else if (view.kind === 'error') {
+    <p class="error" role="alert">{{ view.message }}</p>
+    <button type="button" (click)="loadDetails()">Try again</button>
+  } @else {
+    @let order = view.order;
+    <dl class="details">
+      <div><dt>Order reference</dt><dd>{{ order.clientProvidedExternalReference }}</dd></div>
+      <div>
+        <dt>Order date</dt>
+        <dd><time [attr.datetime]="order.orderDateTimestamp">{{ order.orderDateTimestamp | date:'d MMM yyyy, HH:mm' }}</time></dd>
+      </div>
+      <div><dt>Currency</dt><dd>{{ order.currency }}</dd></div>
+      @if (order.completedDateTimeStamp) {
+        <div>
+          <dt>Completed</dt>
+          <dd><time [attr.datetime]="order.completedDateTimeStamp">{{ order.completedDateTimeStamp | date:'d MMM yyyy, HH:mm' }}</time></dd>
+        </div>
+      }
+      @if (order.notes) {
+        <div class="notes"><dt>Notes</dt><dd>{{ order.notes }}</dd></div>
+      }
+    </dl>
+
+    <h3>Line items</h3>
+    @if (order.lineItems.length === 0) {
+      <p>No line items.</p>
+    } @else {
+      <div class="line-items">
+        <table aria-label="Order line items">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col" class="numeric">Quantity</th>
+              <th scope="col">Unit price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of order.lineItems; track item.id) {
+              <tr>
+                <th scope="row">{{ item.name }}<span class="sku">{{ item.sku }}</span></th>
+                <td class="numeric">{{ item.quantity }}</td>
+                <td>{{ order.currency }}&nbsp;{{ item.unitPrice | currency:order.currency:'' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (order.canChangeStatus) {
+      <form (submit)="$event.preventDefault(); saveStatus()">
+        <fieldset [disabled]="saving()">
+          <div>
+            <label for="order-status">Status</label>
+            <select id="order-status" [formControl]="statusControl">
+              @for (status of statuses; track status) {
+                <option [ngValue]="status">{{ statusDetails[status].label }}</option>
+              }
+            </select>
+          </div>
+          <button type="submit" class="primary"
+            [disabled]="statusControl.value === order.status">
+            {{ saving() ? 'Saving…' : 'Save status' }}
+          </button>
+        </fieldset>
+      </form>
+    } @else {
+      <p class="status-final"><strong>Status</strong> {{ statusDetails[order.status].label }} · This status is final.</p>
+    }
+
+    @if (saveFeedback && saveFeedback.kind === 'error') {
+      <p class="error" role="alert">{{ saveFeedback.message }}</p>
+    } @else if (saveFeedback?.kind === 'saved') {
+      <p class="success" role="status">Status saved.</p>
+    }
+  }
+</dialog>

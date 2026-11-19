@@ -1,11 +1,14 @@
 import { Routes } from '@angular/router';
-import { SalesManagementScreenComponent } from './sales-management/sales-management-screen.component';
+import { CreateOrderComponent } from './purchase-orders/create/create-order.component';
+import { PurchaseOrderListComponent } from './purchase-orders/list/purchase-order-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'sales-management', pathMatch: 'full' },
   {
     path: 'sales-management',
-    component: SalesManagementScreenComponent,
-    title: 'Sales Management'
+    children: [
+      { path: '', pathMatch: 'full', component: PurchaseOrderListComponent, title: 'Sales Management' },
+      { path: 'new', component: CreateOrderComponent, title: 'New purchase order' }
+    ]
   }
 ];

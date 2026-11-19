@@ -1,9 +1,3 @@
-CREATE TABLE IF NOT EXISTS Customers (
-    Id TEXT NOT NULL PRIMARY KEY,
-    Name TEXT NOT NULL CHECK (length(Name) <= 200),
-    Email TEXT NOT NULL CHECK (length(Email) <= 254)
-) STRICT;
-
 CREATE TABLE IF NOT EXISTS Orders (
     Id TEXT NOT NULL PRIMARY KEY,
     ClientProvidedExternalReference TEXT NOT NULL
@@ -13,11 +7,8 @@ CREATE TABLE IF NOT EXISTS Orders (
     Status INTEGER NOT NULL CHECK (Status IN (0, 1, 2, 3)),
     Currency TEXT NOT NULL CHECK (length(Currency) = 3),
     Notes TEXT NOT NULL,
-    CustomerId TEXT NOT NULL REFERENCES Customers (Id),
     CONSTRAINT UQ_Orders_ClientProvidedExternalReference UNIQUE (ClientProvidedExternalReference)
 ) STRICT;
-
-CREATE INDEX IF NOT EXISTS IX_Orders_CustomerId ON Orders (CustomerId);
 
 CREATE TABLE IF NOT EXISTS LineItems (
     Id TEXT NOT NULL PRIMARY KEY,

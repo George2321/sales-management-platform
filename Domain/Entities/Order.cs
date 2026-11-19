@@ -1,4 +1,5 @@
-using SalesManagementPlatformDomain.ValueTypes;
+using SalesManagementPlatform.Domain.Exceptions;
+using SalesManagementPlatform.Domain.ValueTypes;
 
 namespace SalesManagementPlatform.Domain.Entities
 {
@@ -11,37 +12,61 @@ namespace SalesManagementPlatform.Domain.Entities
         public OrderStatus Status { get; private set; }
         public string Currency { get; }
         public string Notes { get; set; }
-        public Guid CustomerId { get; }
         public OrderTotals OrderTotals => CalculateOrderTotals();
 
         public List<LineItem> LineItems = new List<LineItem>();
 
         public Order(
-            string clientProvidedExternalReference,
+            string? clientProvidedExternalReference,
             DateTime orderDateTimestamp,
-            DateTime completedDateTimeStamp,
+            DateTime? completedDateTimeStamp,
             OrderStatus status,
-            string currency,
-            string notes,
-            Guid customerId)
+            string? currency,
+            string notes)
         {
-            ClientProvidedExternalReference = clientProvidedExternalReference;
+            var reference = clientProvidedExternalReference?.Trim() ?? string.Empty;
+            if (reference.Length is 0 or > 128)
+            {
+                throw new DomainRuleException("Enter an order reference of 1 to 128 characters.");
+            }
+
+            var currencyCode = currency?.Trim().ToUpperInvariant() ?? string.Empty;
+            if (currencyCode.Length != 3 || !currencyCode.All(char.IsAsciiLetter))
+            {
+                throw new DomainRuleException("Enter a three-letter currency code.");
+            }
+
+            ClientProvidedExternalReference = reference;
             OrderDateTimestamp = orderDateTimestamp;
             CompletedDateTimeStamp = completedDateTimeStamp;
             Status = status;
-            Currency = currency;
+            Currency = currencyCode;
             Notes = notes;
-            CustomerId = customerId;
         }
 
         public void ChangeOrderStatus(OrderStatus status)
         {
-            if (Status == OrderStatus.Fulfilled || Status == OrderStatus.Cancelled)
+            Status = TransitionStatus(Status, status);
+        }
+
+        public static OrderStatus TransitionStatus(OrderStatus currentStatus, OrderStatus requestedStatus)
+        {
+            if (!Enum.IsDefined(requestedStatus))
             {
-                throw new InvalidOperationException("Cannot change the status of a cancelled or fulfilled order.");
+                throw new DomainRuleException("Choose a valid order status.");
             }
 
-            Status = status;
+            if (!CanChangeStatus(currentStatus))
+            {
+                throw new OrderStatusTransitionException(currentStatus);
+            }
+
+            return requestedStatus;
+        }
+
+        public static bool CanChangeStatus(OrderStatus currentStatus)
+        {
+            return currentStatus is not (OrderStatus.Fulfilled or OrderStatus.Cancelled);
         }
 
         public void ChangeOrderDate(DateTime orderDateTimestamp)
@@ -56,9 +81,7 @@ namespace SalesManagementPlatform.Domain.Entities
 
         public OrderTotals CalculateOrderTotals()
         {
-            OrderTotals.Subtotal = LineItems.Sum(item => item.LineTotal);
-            OrderTotals.Total = OrderTotals.Subtotal + (OrderTotals.Subtotal * 0.1m);
-            return OrderTotals;
+            return OrderTotals.FromSubtotal(LineItems.Sum(item => item.LineTotal));
         }
     }
 }

@@ -1,10 +1,13 @@
 using SalesManagementPlatform.Api.Configuration;
+using SalesManagementPlatform.Api.Middleware;
 using SalesManagementPlatform.Data.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseAndRepositories(builder.Configuration, builder.Environment);
 builder.Services.AddApplicationServices();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi();
@@ -19,6 +22,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 var serveUi = app.Environment.WebRootFileProvider.GetFileInfo("index.html").Exists;
