@@ -12,6 +12,8 @@ public sealed record OrderDetailsDto(
     OrderStatus Status,
     string Currency,
     string Notes,
+    decimal Subtotal,
+    decimal Total,
     IReadOnlyList<OrderLineItemDto> LineItems)
 {
     public bool CanChangeStatus => Order.CanChangeStatus(Status);

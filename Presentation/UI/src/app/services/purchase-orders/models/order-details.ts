@@ -6,9 +6,10 @@ export interface OrderLineItem {
   readonly name: string;
   readonly quantity: number;
   readonly unitPrice: number;
+  readonly lineTotal: number;
 }
 
-export interface OrderDetails extends Omit<OrderListItem, 'lineItemCount' | 'subtotal' | 'total'> {
+export interface OrderDetails extends Omit<OrderListItem, 'lineItemCount'> {
   readonly completedDateTimeStamp: string | null;
   readonly notes: string;
   readonly lineItems: readonly OrderLineItem[];

@@ -53,7 +53,9 @@ namespace SalesManagementPlatform.Domain.Entities
 
         public decimal CalculateLineTotal()
         {
-            return Quantity * UnitPrice;
+            return CalculateLineTotal(Quantity, UnitPrice);
         }
+
+        public static decimal CalculateLineTotal(int quantity, decimal unitPrice) => quantity * unitPrice;
     }
 }

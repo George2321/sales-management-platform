@@ -78,7 +78,7 @@ internal sealed class OrderRepository : IOrderRepository
                 if (!reader.IsDBNull(6))
                 {
                     lineItemCount++;
-                    subtotal += reader.GetInt32(6) * reader.GetDecimal(7);
+                    subtotal += LineItem.CalculateLineTotal(reader.GetInt32(6), reader.GetDecimal(7));
                 }
                 hasRow = await reader.ReadAsync(cancellationToken);
             }
@@ -243,34 +243,37 @@ internal sealed class OrderRepository : IOrderRepository
             return null;
         }
 
+        var orderId = reader.GetGuid(0);
+        var reference = reader.GetString(1);
+        var orderDate = DateTime.SpecifyKind(reader.GetDateTime(2), DateTimeKind.Utc);
+        DateTime? completedDate = reader.IsDBNull(3) ? null
+            : DateTime.SpecifyKind(reader.GetDateTime(3), DateTimeKind.Utc);
+        var status = (OrderStatus)reader.GetInt32(4);
+        var currency = reader.GetString(5);
+        var notes = reader.GetString(6);
+        var customerName = reader.GetString(7);
         var lineItems = new List<OrderLineItemDto>();
-        var order = new OrderDetailsDto(
-            Id: reader.GetGuid(0),
-            ClientProvidedExternalReference: reader.GetString(1),
-            OrderDateTimestamp: DateTime.SpecifyKind(reader.GetDateTime(2), DateTimeKind.Utc),
-            CompletedDateTimeStamp: reader.IsDBNull(3) ? null
-                : DateTime.SpecifyKind(reader.GetDateTime(3), DateTimeKind.Utc),
-            Status: (OrderStatus)reader.GetInt32(4),
-            Currency: reader.GetString(5),
-            Notes: reader.GetString(6),
-            CustomerName: reader.GetString(7),
-            LineItems: lineItems);
 
         do
         {
             if (!reader.IsDBNull(8))
             {
+                var quantity = reader.GetInt32(11);
+                var unitPrice = reader.GetDecimal(12);
                 lineItems.Add(new OrderLineItemDto(
                     Id: reader.GetGuid(8),
                     Sku: reader.GetString(9),
                     Name: reader.GetString(10),
-                    Quantity: reader.GetInt32(11),
-                    UnitPrice: reader.GetDecimal(12)));
+                    Quantity: quantity,
+                    UnitPrice: unitPrice,
+                    LineTotal: LineItem.CalculateLineTotal(quantity, unitPrice)));
             }
         }
         while (await reader.ReadAsync(cancellationToken));
 
-        return order;
+        var totals = OrderTotals.FromSubtotal(lineItems.Sum(item => item.LineTotal));
+        return new OrderDetailsDto(orderId, reference, customerName, orderDate, completedDate,
+            status, currency, notes, totals.Subtotal, totals.Total, lineItems);
     }
 
     private sealed record TextLimit(string Column, string Label, int MaxLength)

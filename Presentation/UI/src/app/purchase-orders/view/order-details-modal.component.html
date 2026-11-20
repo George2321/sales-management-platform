@@ -33,31 +33,41 @@
     </dl>
 
     <h3>Line items</h3>
-    @if (order.lineItems.length === 0) {
-      <p>No line items.</p>
-    } @else {
-      <div class="line-items">
-        @let unitPriceDigits = '1.' + currencyDigits(order.currency) + '-28';
-        <table aria-label="Order line items">
-          <thead>
+    <div class="line-items">
+      @let unitPriceDigits = '1.' + currencyDigits(order.currency) + '-28';
+      <table aria-label="Order line items">
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col" class="numeric">Quantity</th>
+            <th scope="col">Unit price</th>
+            <th scope="col">Line total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of order.lineItems; track item.id) {
             <tr>
-              <th scope="col">Item</th>
-              <th scope="col" class="numeric">Quantity</th>
-              <th scope="col">Unit price</th>
+              <th scope="row">{{ item.name }}<span class="sku">{{ item.sku }}</span></th>
+              <td class="numeric">{{ item.quantity }}</td>
+              <td>{{ order.currency }}&nbsp;{{ item.unitPrice | currency:order.currency:'':unitPriceDigits }}</td>
+              <td>{{ order.currency }}&nbsp;{{ item.lineTotal | currency:order.currency:'' }}</td>
             </tr>
-          </thead>
-          <tbody>
-            @for (item of order.lineItems; track item.id) {
-              <tr>
-                <th scope="row">{{ item.name }}<span class="sku">{{ item.sku }}</span></th>
-                <td class="numeric">{{ item.quantity }}</td>
-                <td>{{ order.currency }}&nbsp;{{ item.unitPrice | currency:order.currency:'':unitPriceDigits }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+          } @empty {
+            <tr><td colspan="4">No line items.</td></tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan="3">Subtotal</th>
+            <td>{{ order.currency }}&nbsp;{{ order.subtotal | currency:order.currency:'' }}</td>
+          </tr>
+          <tr>
+            <th scope="row" colspan="3">Total</th>
+            <td><strong>{{ order.currency }}&nbsp;{{ order.total | currency:order.currency:'' }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
 
     @if (order.canChangeStatus) {
       <form (submit)="$event.preventDefault(); saveStatus()">

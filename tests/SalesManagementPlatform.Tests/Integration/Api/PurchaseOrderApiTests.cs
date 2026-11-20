@@ -75,13 +75,22 @@ public class PurchaseOrderApiTests
         {
             clientProvidedExternalReference = reference, customerId = _customerId, currency = "ZAR",
             subtotal = 999m, total = 999m,
-            lineItems = new[] { new { sku = "A", name = "Sample", quantity = 3, unitPrice = 2.50m, lineTotal = 999m } }
+            lineItems = new[]
+            {
+                new { sku = "A", name = "Sample", quantity = 3, unitPrice = 2.50m, lineTotal = 999m },
+                new { sku = "B", name = "Second item", quantity = 2, unitPrice = 1.25m, lineTotal = 999m }
+            }
         });
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         var orders = await _client.GetFromJsonAsync<OrderListItemDto[]>(OrdersUrl);
         var saved = orders!.Single(o => o.ClientProvidedExternalReference == reference);
-        Assert.That(saved.Subtotal, Is.EqualTo(7.50m));
-        Assert.That(saved.Total, Is.EqualTo(8.25m));
+        Assert.That(saved.Subtotal, Is.EqualTo(10m));
+        Assert.That(saved.Total, Is.EqualTo(11m));
+
+        var details = await _client.GetFromJsonAsync<OrderDetailsDto>($"{OrdersUrl}/{saved.Id}");
+        Assert.That(details!.LineItems.Select(item => item.LineTotal), Is.EqualTo(new[] { 7.50m, 2.50m }));
+        Assert.That(details.Subtotal, Is.EqualTo(saved.Subtotal));
+        Assert.That(details.Total, Is.EqualTo(saved.Total));
     }
 
     [Test]
