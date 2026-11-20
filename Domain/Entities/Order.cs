@@ -1,4 +1,5 @@
 using SalesManagementPlatform.Domain.Exceptions;
+using SalesManagementPlatform.Domain.ValueObjects;
 using SalesManagementPlatform.Domain.ValueTypes;
 
 namespace SalesManagementPlatform.Domain.Entities
@@ -10,6 +11,7 @@ namespace SalesManagementPlatform.Domain.Entities
         public DateTime OrderDateTimestamp { get; private set; }
         public DateTime? CompletedDateTimeStamp { get; private set; }
         public OrderStatus Status { get; private set; }
+        public Guid CustomerId { get; }
         public string Currency { get; }
         public string Notes { get; set; }
         public OrderTotals OrderTotals => CalculateOrderTotals();
@@ -22,12 +24,13 @@ namespace SalesManagementPlatform.Domain.Entities
             DateTime? completedDateTimeStamp,
             OrderStatus status,
             string? currency,
-            string notes)
+            string notes,
+            Guid customerId)
         {
             var reference = clientProvidedExternalReference?.Trim() ?? string.Empty;
-            if (reference.Length is 0 or > 128)
+            if (reference.Length == 0)
             {
-                throw new DomainRuleException("Enter an order reference of 1 to 128 characters.");
+                throw new DomainRuleException("Enter an order reference.");
             }
 
             var currencyCode = currency?.Trim().ToUpperInvariant() ?? string.Empty;
@@ -36,6 +39,17 @@ namespace SalesManagementPlatform.Domain.Entities
                 throw new DomainRuleException("Enter a three-letter currency code.");
             }
 
+            if (customerId == Guid.Empty)
+            {
+                throw new DomainRuleException("Select a customer for the order.");
+            }
+
+            if ((status == OrderStatus.Fulfilled) != completedDateTimeStamp.HasValue)
+            {
+                throw new DomainRuleException("A completion time is required only for fulfilled orders.");
+            }
+
+            CustomerId = customerId;
             ClientProvidedExternalReference = reference;
             OrderDateTimestamp = orderDateTimestamp;
             CompletedDateTimeStamp = completedDateTimeStamp;
@@ -46,22 +60,19 @@ namespace SalesManagementPlatform.Domain.Entities
 
         public void ChangeOrderStatus(OrderStatus status)
         {
-            Status = TransitionStatus(Status, status);
+            (Status, CompletedDateTimeStamp) = TransitionStatus(Status, status);
         }
 
-        public static OrderStatus TransitionStatus(OrderStatus currentStatus, OrderStatus requestedStatus)
+        public static (OrderStatus Status, DateTime? CompletedDateTimeStamp) TransitionStatus(
+            OrderStatus currentStatus, OrderStatus requestedStatus)
         {
-            if (!Enum.IsDefined(requestedStatus))
-            {
-                throw new DomainRuleException("Choose a valid order status.");
-            }
-
             if (!CanChangeStatus(currentStatus))
             {
-                throw new OrderStatusTransitionException(currentStatus);
+                throw new DomainRuleException(
+                    $"This order is already {currentStatus.ToString().ToLowerInvariant()}. Its status can no longer be changed.");
             }
 
-            return requestedStatus;
+            return (requestedStatus, requestedStatus == OrderStatus.Fulfilled ? DateTime.UtcNow : null);
         }
 
         public static bool CanChangeStatus(OrderStatus currentStatus)
@@ -72,11 +83,6 @@ namespace SalesManagementPlatform.Domain.Entities
         public void ChangeOrderDate(DateTime orderDateTimestamp)
         {
             OrderDateTimestamp = orderDateTimestamp;
-        }
-
-        public void ChangeCompletedDate(DateTime completedDateTimeStamp)
-        {
-            CompletedDateTimeStamp = completedDateTimeStamp;
         }
 
         public OrderTotals CalculateOrderTotals()

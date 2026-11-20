@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Application/SalesManagementPlatform.Application.csproj" />
+  <Project Path="Domain/SalesManagementPlatform.Domain.csproj" />
+  <Project Path="Infrastructure/SalesManagementPlatform.Infrastructure.csproj" />
+  <Project Path="Presentation/API/SalesManagementPlatform.Api.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/SalesManagementPlatform.Tests/SalesManagementPlatform.Tests.csproj" />
+  </Folder>
+</Solution>

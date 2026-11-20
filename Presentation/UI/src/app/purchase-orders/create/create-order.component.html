@@ -1,0 +1,145 @@
+<main>
+  <header>
+    <a [routerLink]="saving() ? null : '..'" [replaceUrl]="true" [attr.aria-disabled]="saving() || null">
+      Back to purchase orders
+    </a>
+    <h1>New order</h1>
+  </header>
+
+  @let lookup = customerState();
+  <form [formGroup]="form" [attr.aria-busy]="saving()" (ngSubmit)="saveOrder()">
+    <fieldset [disabled]="saving()">
+      <div class="fields">
+        @let clientProvidedExternalReferenceError = fieldError(form.controls.clientProvidedExternalReference, hints.clientProvidedExternalReference);
+        <div>
+          <label>
+            Order reference
+            <input formControlName="clientProvidedExternalReference" maxlength="128" required
+              [attr.aria-invalid]="clientProvidedExternalReferenceError ? true : null" [attr.aria-describedby]="clientProvidedExternalReferenceError ? 'clientProvidedExternalReference-error' : null">
+          </label>
+          @if (clientProvidedExternalReferenceError) {
+            <small class="error" id="clientProvidedExternalReference-error">{{ clientProvidedExternalReferenceError }}</small>
+          }
+        </div>
+        @let currencyError = fieldError(form.controls.currency, hints.currency);
+        <div>
+          <label>
+            Currency code
+            <input formControlName="currency" maxlength="3" required
+              [attr.aria-invalid]="currencyError ? true : null" [attr.aria-describedby]="currencyError ? 'currency-error' : null">
+          </label>
+          @if (currencyError) {
+            <small class="error" id="currency-error">{{ currencyError }}</small>
+          }
+        </div>
+        <div class="wide">
+          @if (lookup.kind === 'loading') {
+            <p role="status">Loading customers&hellip;</p>
+          } @else if (lookup.kind === 'error') {
+            <p class="error" role="alert">{{ lookup.message }}</p>
+            <button type="button" (click)="loadCustomers()">Try again</button>
+          } @else if (lookup.customers.length === 0) {
+            <p role="status">An existing customer is required. No customers are available.</p>
+          } @else {
+            @let customerIdError = fieldError(form.controls.customerId, hints.customerId);
+            <label>
+              Customer
+              <select formControlName="customerId" required
+                [attr.aria-invalid]="customerIdError ? true : null" [attr.aria-describedby]="customerIdError ? 'customerId-error' : null">
+                <option value="">Select a customer</option>
+                @for (customer of lookup.customers; track customer.id) {
+                  <option [value]="customer.id">{{ customer.name }}</option>
+                }
+              </select>
+            </label>
+            @if (customerIdError) {
+              <small class="error" id="customerId-error">{{ customerIdError }}</small>
+            }
+          }
+        </div>
+        @let notesError = fieldError(form.controls.notes, hints.notes);
+        <div class="wide">
+          <label>
+            Notes (optional)
+            <textarea formControlName="notes" rows="2"
+              [attr.aria-invalid]="notesError ? true : null" [attr.aria-describedby]="notesError ? 'notes-error' : null"></textarea>
+          </label>
+          @if (notesError) {
+            <small class="error" id="notes-error">{{ notesError }}</small>
+          }
+        </div>
+      </div>
+
+      <div formArrayName="lineItems">
+        @for (item of form.controls.lineItems.controls; track item; let index = $index) {
+          <fieldset class="line-item" [formGroupName]="index">
+            <legend>Line item {{ index + 1 }}</legend>
+            <div class="item-fields">
+              @let skuError = fieldError(item.controls.sku, hints.sku);
+              <div>
+                <label>
+                  SKU
+                  <input formControlName="sku" maxlength="64" required
+                    [attr.aria-invalid]="skuError ? true : null" [attr.aria-describedby]="skuError ? 'sku-error-' + index : null">
+                </label>
+                @if (skuError) {
+                  <small class="error" [id]="'sku-error-' + index">{{ skuError }}</small>
+                }
+              </div>
+              @let nameError = fieldError(item.controls.name, hints.name);
+              <div>
+                <label>
+                  Name
+                  <input formControlName="name" maxlength="200" required
+                    [attr.aria-invalid]="nameError ? true : null" [attr.aria-describedby]="nameError ? 'name-error-' + index : null">
+                </label>
+                @if (nameError) {
+                  <small class="error" [id]="'name-error-' + index">{{ nameError }}</small>
+                }
+              </div>
+              @let quantityError = fieldError(item.controls.quantity, hints.quantity);
+              <div>
+                <label>
+                  Quantity
+                  <input type="number" formControlName="quantity" min="1" step="1" required
+                    [attr.aria-invalid]="quantityError ? true : null" [attr.aria-describedby]="quantityError ? 'quantity-error-' + index : null">
+                </label>
+                @if (quantityError) {
+                  <small class="error" [id]="'quantity-error-' + index">{{ quantityError }}</small>
+                }
+              </div>
+              @let unitPriceError = fieldError(item.controls.unitPrice, hints.unitPrice);
+              <div>
+                <label>
+                  Unit price
+                  <input type="number" formControlName="unitPrice" min="0" step="any" required
+                    [attr.aria-invalid]="unitPriceError ? true : null" [attr.aria-describedby]="unitPriceError ? 'unitPrice-error-' + index : null">
+                </label>
+                @if (unitPriceError) {
+                  <small class="error" [id]="'unitPrice-error-' + index">{{ unitPriceError }}</small>
+                }
+              </div>
+            </div>
+            @if (form.controls.lineItems.length > 1) {
+              <button type="button" (click)="removeLineItem(index)" [attr.aria-label]="'Remove line item ' + (index + 1)">
+                Remove
+              </button>
+            }
+          </fieldset>
+        }
+      </div>
+      <button type="button" (click)="addLineItem()">Add line item</button>
+
+      @if (saveError(); as error) {
+        <p class="error" role="alert">{{ error }}</p>
+      }
+
+      <div class="actions">
+        <button class="primary" type="submit" [disabled]="lookup.kind !== 'ready' || lookup.customers.length === 0">{{ saving() ? 'Saving…' : 'Save order' }}</button>
+        <a [routerLink]="saving() ? null : '..'" [replaceUrl]="true" [attr.aria-disabled]="saving() || null">
+          Cancel
+        </a>
+      </div>
+    </fieldset>
+  </form>
+</main>

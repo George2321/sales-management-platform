@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Sales Management (.NET + Angular)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Sales Management API",
+      "program": "${workspaceFolder}/Presentation/API/bin/Debug/net10.0/SalesManagementPlatform.Api.dll",
+      "cwd": "${workspaceFolder}/Presentation/API",
+      "launchSettingsProfile": "http",
+      "console": "internalConsole",
+      "serverReadyAction": {
+        "pattern": "\\bNow listening on:\\s+http://localhost:5058\\b",
+        "action": "startDebugging",
+        "name": "Angular (Chrome)",
+        "killOnServerStop": true
+      }
+    },
+    {
+      "name": "Angular (Chrome)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/Presentation/UI/node_modules/@angular/cli/bin/ng.js",
+      "args": ["serve", "--port", "4200"],
+      "cwd": "${workspaceFolder}/Presentation/UI",
+      "console": "internalConsole",
+      "outputCapture": "std",
+      "env": {
+        "NG_CLI_ANALYTICS": "false",
+        "NO_COLOR": "1"
+      },
+      "serverReadyAction": {
+        "pattern": "\\bLocal:\\s+(http://localhost:4200/)",
+        "action": "debugWithChrome",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}/Presentation/UI",
+        "killOnServerStop": true
+      }
+    }
+  ]
+}

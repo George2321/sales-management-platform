@@ -1,0 +1,53 @@
+main {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: clamp(1.75rem, 5vw, 3.5rem);
+}
+
+h1 {
+  margin: .5rem 0 0;
+  font-size: clamp(1.65rem, 4vw, 2.2rem);
+  letter-spacing: -.035em;
+}
+
+form {
+  margin-top: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid #dce4ec;
+  border-radius: .75rem;
+  background: #fff;
+}
+
+fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+
+.fields, .item-fields {
+  display: grid;
+  gap: .8rem 1rem;
+}
+
+.fields { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.item-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) repeat(2, minmax(0, 1fr)); }
+.wide { grid-column: 1 / -1; }
+label { display: grid; align-content: start; gap: .25rem; font-size: .9rem; font-weight: 600; }
+input, select, textarea, button {
+  box-sizing: border-box;
+  padding: .5rem .7rem;
+  border: 1px solid #a5b5c4;
+  border-radius: .4rem;
+  color: inherit;
+  background: #fff;
+  font: inherit;
+}
+
+input, select, textarea { width: 100%; font-weight: 400; }
+input.ng-invalid.ng-touched, select.ng-invalid.ng-touched { border-color: #a33145; }
+textarea { resize: vertical; }
+.line-item { margin: 1rem 0; padding: .75rem; border: 1px solid #dce4ec; border-radius: .5rem; }
+.line-item legend { padding-inline: .25rem; font-weight: 650; }
+.line-item button { margin-top: .75rem; }
+button { cursor: pointer; }
+button.primary { color: #fff; border-color: #1c5376; background: #1c5376; }
+a { color: #145782; text-underline-offset: .15em; }
+a[aria-disabled='true'], button:disabled, fieldset:disabled button { opacity: .55; cursor: default; }
+.actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; }
+.error { color: #8a2634; }
